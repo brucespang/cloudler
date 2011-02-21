@@ -15,3 +15,10 @@ This creates a Cloudfile in the current directory. Just update the Cloudfile wit
 To run a command, simply use:
 
 	$ cloud run
+
+Notes
+-----
+
+Clouder runs commands blockingly, so if you have a long task that you want run, and/or multiple servers you want to run it on, it's probably a good idea to use screen. For example,
+
+	$ screen -dmS [Your Command]
