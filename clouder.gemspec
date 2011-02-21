@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
 	s.files = `git ls-files`.split("\n")
   s.require_paths = ["lib"]
-  s.summary = %q{Runs a command on a remote server}
+  s.summary = %q{Runs a script on a remote server}
 	s.executables = %w(cloud)
 	s.default_executable = 'cloud'
 end
