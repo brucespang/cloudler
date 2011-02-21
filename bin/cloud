@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require 'clouder'
+if ARGV.first == 'init'
+	Clouder.init
+elsif ARGV.first == 'run'
+	if File.exists? 'Cloudfile'
+		Clouder.run
+	else
+		puts "It doesn't like this is a cloud project. Try running 'cloud init'"
+	end
+end

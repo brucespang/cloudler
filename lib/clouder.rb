@@ -57,6 +57,19 @@ class Clouder
 			puts "Command finished."
 		end
 	end
+
+	def self.init
+		File.open "Cloudfile", 'w' do |f|
+			f.write <<-EOS
+host 'HOSTNAME'
+username 'USERNAME'
+password 'PASSWORD'
+command 'COMMAND'
+files [] # Optional list of files to upload
+gems [] # Optional list of gems to install
+			EOS
+		end
+	end
 end
 
 def host url
@@ -81,8 +94,4 @@ end
 
 def files array
 	Clouder.files = array
-end
-
-at_exit do
-	Clouder.run
 end
