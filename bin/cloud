@@ -9,4 +9,9 @@ elsif ARGV.first == 'run'
 	else
 		puts "It doesn't like this is a cloud project. Try running 'cloud init'"
 	end
+else
+	puts "Usage: cloud [command]"
+	puts "  commands:"
+	puts "    init -- create a new clouder project"
+	puts "    run -- run a cloud project"
 end
