@@ -1,7 +1,7 @@
-require './lib/clouder.rb'
+require './lib/cloudler.rb'
 
 Gem::Specification.new do |s|
-  s.name = 'clouder'
+  s.name = 'cloudler'
   s.version = 0.1
   s.authors = ["Bruce Spang"]
   s.date = Time.now.utc.strftime("%Y-%m-%d")

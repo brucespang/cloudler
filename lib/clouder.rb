@@ -1,7 +1,7 @@
 require 'net/ssh'
 require 'net/scp'
 
-class Clouder
+class Cloudler
 	def self.hosts= hosts
 		@hosts = hosts
 	end
@@ -33,12 +33,12 @@ class Clouder
 		@hosts.each do |host|
 			Net::SSH.start(host, @username, :password => @password) do |ssh|
 				puts "Uploading files..."
-				ssh.exec! "rm -rf /home/#{@username}/.clouder"
-				ssh.exec! "mkdir /home/#{@username}/.clouder"
+				ssh.exec! "rm -rf /home/#{@username}/.cloudler"
+				ssh.exec! "mkdir /home/#{@username}/.cloudler"
 				if @files.length > 0
-					ssh.scp.upload(@files.join(' '), "/home/#{@username}/.clouder", :recursive => true)
+					ssh.scp.upload(@files.join(' '), "/home/#{@username}/.cloudler", :recursive => true)
 				else
-	  			ssh.scp.upload!('.', "/home/#{@username}/.clouder", :recursive => true)
+	  			ssh.scp.upload!('.', "/home/#{@username}/.cloudler", :recursive => true)
 				end
 	
 				puts "Files uploaded."
@@ -52,7 +52,7 @@ class Clouder
 				end
 	
 				puts "Executing command..."
-				ssh.exec! "cd /home/#{@username}/.clouder && #{@command}" do |ch, stream, data|
+				ssh.exec! "cd /home/#{@username}/.cloudler && #{@command}" do |ch, stream, data|
 					puts data
 				end
 				puts "Command finished."
@@ -76,28 +76,28 @@ end
 
 def host hosts
 	if hosts.is_a? Array
-		Clouder.hosts = hosts
+		Cloudler.hosts = hosts
 	else
-		Clouder.hosts = [hosts]
+		Cloudler.hosts = [hosts]
 	end
 end
 
 def username name
-	Clouder.username = name
+	Cloudler.username = name
 end
 
 def command string
-	Clouder.command = string
+	Cloudler.command = string
 end
 
 def gems array
-	Clouder.gems = array
+	Cloudler.gems = array
 end
 
 def password pass
-	Clouder.password = pass
+	Cloudler.password = pass
 end
 
 def files array
-	Clouder.files = array
+	Cloudler.files = array
 end
