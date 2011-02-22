@@ -26,9 +26,14 @@ class Cloudler
 		@files = files
 	end
 
+	def self.precommands= precommands
+		@precommands = precommands
+	end
+
 	def self.run
 		@files ||= []
 		@gems ||= []
+		@precommands ||= []
 
 		@hosts.each do |host|
 			Net::SSH.start(host, @username, :password => @password) do |ssh|
@@ -51,6 +56,16 @@ class Cloudler
 					puts "Gems installed"
 				end
 	
+				if @precommands.length > 0
+					puts "Executing pre-commands"
+					@precommands.each do |command|
+						ssh.exec "cd /home/#{@username}/.cloudler && #{command}" do |ch,stream,data|
+							puts data
+						end
+					end
+					puts "Pre-commands executed."
+				end
+
 				puts "Executing command..."
 				ssh.exec! "cd /home/#{@username}/.cloudler && #{@command}" do |ch, stream, data|
 					puts data
@@ -66,6 +81,7 @@ class Cloudler
 host 'HOSTNAME' # or for multiple servers, use ['HOST1', 'HOST2', ...]
 username 'USERNAME'
 password 'PASSWORD'
+precommand [] # Optional list of commands to run before executing the main command
 command 'COMMAND'
 files [] # Optional list of files to upload
 gems [] # Optional list of gems to install
@@ -100,4 +116,8 @@ end
 
 def files array
 	Cloudler.files = array
+end
+
+def precommands array
+	Clouder.precommands = array
 end

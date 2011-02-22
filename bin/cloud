@@ -1,17 +1,22 @@
 #!/usr/bin/env ruby
 
-require 'cloudler'
+require 'clouder'
 if ARGV.first == 'init'
-	Cloudler.init
+	Clouder.init
 elsif ARGV.first == 'run'
 	if File.exists? 'Cloudfile'
-		Cloudler.run
+		File.open 'Cloudfile', 'r' do |f|
+			config = f.read
+			eval config
+		end
+		
+		Clouder.run
 	else
 		puts "It doesn't like this is a cloud project. Try running 'cloud init'"
 	end
 else
 	puts "Usage: cloud [command]"
 	puts "  commands:"
-	puts "    init -- create a new cloudler project"
+	puts "    init -- create a new clouder project"
 	puts "    run -- run a cloud project"
 end
