@@ -2,7 +2,7 @@ require './lib/cloudler.rb'
 
 Gem::Specification.new do |s|
   s.name = 'cloudler'
-  s.version = '0.1.1'
+  s.version = Cloudler::VERSION
   s.authors = ["Bruce Spang"]
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.email = %q{bruce@brucespang.com}

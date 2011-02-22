@@ -2,6 +2,9 @@ require 'net/ssh'
 require 'net/scp'
 
 class Cloudler
+
+	VERSION = '0.1.2'
+
 	def self.hosts= hosts
 		@hosts = hosts
 	end
@@ -30,20 +33,32 @@ class Cloudler
 		@precommands = precommands
 	end
 
+	def self.path= path
+		@path = path
+	end
+
 	def self.run
 		@files ||= []
 		@gems ||= []
 		@precommands ||= []
+		@path ||= 
+			if @username == 'root'
+				'/root/.cloudler'
+			else
+				"/home/#{@username}/.cloudler"
+			end
 
 		@hosts.each do |host|
 			Net::SSH.start(host, @username, :password => @password) do |ssh|
 				puts "Uploading files..."
-				ssh.exec! "rm -rf /home/#{@username}/.cloudler"
-				ssh.exec! "mkdir /home/#{@username}/.cloudler"
+				ssh.exec! "rm -rf #{@path}"
+				ssh.exec! "mkdir #{@path}"
 				if @files.length > 0
-					ssh.scp.upload(@files.join(' '), "/home/#{@username}/.cloudler", :recursive => true)
+					@files.each do |file|
+						ssh.scp.upload(file, "#{@path}", :recursive => true)
+					end
 				else
-	  			ssh.scp.upload!('.', "/home/#{@username}/.cloudler", :recursive => true)
+	  			ssh.scp.upload!('.', "#{@path}", :recursive => true)
 				end
 	
 				puts "Files uploaded."
@@ -59,7 +74,7 @@ class Cloudler
 				if @precommands.length > 0
 					puts "Executing pre-commands"
 					@precommands.each do |command|
-						ssh.exec "cd /home/#{@username}/.cloudler && #{command}" do |ch,stream,data|
+						ssh.exec "cd #{@path} && #{command}" do |ch,stream,data|
 							puts data
 						end
 					end
@@ -67,11 +82,11 @@ class Cloudler
 				end
 
 				puts "Executing command..."
-				ssh.exec! "cd /home/#{@username}/.cloudler && #{@command}" do |ch, stream, data|
+				ssh.exec! "cd #{@path} && #{@command}" do |ch, stream, data|
 					puts data
 				end
 				puts "Command finished."
-			end
+			end				
 		end
 	end
 
@@ -81,6 +96,7 @@ class Cloudler
 host 'HOSTNAME' # or for multiple servers, use ['HOST1', 'HOST2', ...]
 username 'USERNAME'
 password 'PASSWORD'
+path 'PATH' # Optional path to upload the files to. By default it is /root/.cloudler, or /home/[username]/.cloudler
 precommands [] # Optional list of commands to run before executing the main command
 command 'COMMAND'
 files [] # Optional list of files to upload
@@ -120,4 +136,8 @@ end
 
 def precommands array
 	Cloudler.precommands = array
+end
+
+def path string
+	Cloudler.path = string
 end
