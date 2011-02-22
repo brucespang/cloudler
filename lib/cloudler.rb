@@ -81,7 +81,7 @@ class Cloudler
 host 'HOSTNAME' # or for multiple servers, use ['HOST1', 'HOST2', ...]
 username 'USERNAME'
 password 'PASSWORD'
-precommand [] # Optional list of commands to run before executing the main command
+precommands [] # Optional list of commands to run before executing the main command
 command 'COMMAND'
 files [] # Optional list of files to upload
 gems [] # Optional list of gems to install
@@ -119,5 +119,5 @@ def files array
 end
 
 def precommands array
-	Clouder.precommands = array
+	Cloudler.precommands = array
 end
