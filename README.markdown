@@ -8,7 +8,7 @@ Installation
 
 To install Cloudler, run
 
-	$ gem install cloudler-0.1.gem
+	$ gem install cloudler
 
 Usage
 -----
