@@ -54,13 +54,11 @@ class Cloudler
 				ssh.exec! "rm -rf #{@path}"
 				ssh.exec! "mkdir #{@path}"
 				if @files.length > 0
-					@files.each do |file|
-						ssh.scp.upload(file, "#{@path}", :recursive => true)
-					end
+	  			ssh.scp.upload!(@files.join(' '), @path, :recursive => true)
 				else
-	  			ssh.scp.upload!('.', "#{@path}", :recursive => true)
+					ssh.scp.upload('.', @path, :recursive => true)
 				end
-	
+				
 				puts "Files uploaded."
 	
 				if @gems.length > 0 
