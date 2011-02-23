@@ -56,7 +56,7 @@ class Cloudler
 				if @files.length > 0
 	  			ssh.scp.upload!(@files.join(' '), @path, :recursive => true)
 				else
-					ssh.scp.upload('.', @path, :recursive => true)
+					ssh.scp.upload!('.', @path, :recursive => true)
 				end
 				
 				puts "Files uploaded."
