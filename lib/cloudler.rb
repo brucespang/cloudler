@@ -3,7 +3,7 @@ require 'net/scp'
 
 class Cloudler
 
-	VERSION = '0.1.2'
+	VERSION = '0.1.3'
 
 	def self.hosts= hosts
 		@hosts = hosts
