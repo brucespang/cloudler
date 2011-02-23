@@ -61,14 +61,6 @@ class Cloudler
 				
 				puts "Files uploaded."
 	
-				if @gems.length > 0 
-					puts "Installing gems..."
-					ssh.exec! "gem install #{@gems.join ' '}" do |ch, stream, data|
-						puts data
-					end
-					puts "Gems installed"
-				end
-	
 				if @precommands.length > 0
 					puts "Executing pre-commands"
 					@precommands.each do |command|
@@ -79,6 +71,14 @@ class Cloudler
 					puts "Pre-commands executed."
 				end
 
+				if @gems.length > 0 
+					puts "Installing gems..."
+					ssh.exec! "gem install #{@gems.join ' '}" do |ch, stream, data|
+						puts data
+					end
+					puts "Gems installed"
+				end
+	
 				puts "Executing command..."
 				ssh.exec! "cd #{@path} && #{@command}" do |ch, stream, data|
 					puts data
