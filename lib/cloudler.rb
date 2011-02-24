@@ -5,38 +5,10 @@ class Cloudler
 
 	VERSION = '0.2.0'
 
-	def self.hosts= hosts
-		@hosts = hosts
+	class << self
+		attr_accessor :hosts, :username, :command, :gems, :password, :files, :precommands, :path
 	end
-
-	def self.username= username
-		@username = username
-	end
-
-	def self.command= string
-		@command = string
-	end
-
-	def self.gems= array
-		@gems = array
-	end
-
-	def self.password= password
-		@password = password
-	end
-
-	def self.files= files
-		@files = files
-	end
-
-	def self.precommands= precommands
-		@precommands = precommands
-	end
-
-	def self.path= path
-		@path = path
-	end
-
+	
 	def self.test_connection
 		@hosts.each do |host|
 			begin
@@ -97,6 +69,8 @@ class Cloudler
 	def self.upload_files ssh
 		ssh.exec! "rm -rf #{@path}"
 		ssh.exec! "mkdir #{@path}"
+
+		# By default, Cloudler uploads the entire current directory
 		if @files.length > 0
 	  	ssh.scp.upload!(@files.join(' '), @path, :recursive => true)
 		else
@@ -106,6 +80,8 @@ class Cloudler
 
 	def self.execute_precommands ssh
 		@precommands.each do |command|
+			# We cd to @path so that the user can modify or run their uploaded files if
+			# they need to
 			ssh.exec "cd #{@path} && #{command}" do |ch,stream,data|
 				puts data
 			end
@@ -119,6 +95,8 @@ class Cloudler
 	end
 
 	def self.execute_command ssh
+		# We cd to @path so that the user has access to their uploaded files when
+		# they try to run them
 		ssh.exec! "cd #{@path} && #{@command}" do |ch, stream, data|
 			puts data
 		end
