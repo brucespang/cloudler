@@ -1,22 +1,44 @@
 #!/usr/bin/env ruby
 
 require 'cloudler'
-if ARGV.first == 'init'
+action = ARGV.shift
+if action == 'init'
 	Cloudler.init
-elsif ARGV.first == 'run'
+elsif action == 'test'
+	if File.exists? 'Cloudfile'
+		File.open 'Cloudfile', 'r' do |f|
+			config = f.read
+			eval config
+		end
+
+		Cloudler.test_connection
+	else
+		puts "It doesn't like this is a cloudler project. Try running 'cloud init'"
+	end
+elsif action == 'run'
 	if File.exists? 'Cloudfile'
 		File.open 'Cloudfile', 'r' do |f|
 			config = f.read
 			eval config
 		end
 		
-		Cloudler.run
+		if ARGV.length > 0
+			Cloudler.run ARGV.collect {|a| a.to_sym}
+		else
+			Cloudler.run
+		end
 	else
 		puts "It doesn't like this is a cloudler project. Try running 'cloud init'"
 	end
 else
-	puts "Usage: cloud [command]"
+	puts "Usage: cloud [command] [args]"
 	puts "  commands:"
 	puts "    init -- create a new cloudler project"
+	puts "    test -- test the cloudler settings"
 	puts "    run -- run a cloud project"
+	puts "      If you want to run only part of the actions, you can use:"
+	puts "        upload -- Upload files"
+	puts "        precommands -- Run the precommands"
+	puts "        gems -- Install the gems"
+	puts "        command -- Run the command"
 end

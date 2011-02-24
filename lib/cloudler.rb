@@ -3,7 +3,7 @@ require 'net/scp'
 
 class Cloudler
 
-	VERSION = '0.1.5'
+	VERSION = '0.2.0'
 
 	def self.hosts= hosts
 		@hosts = hosts
@@ -37,7 +37,20 @@ class Cloudler
 		@path = path
 	end
 
-	def self.run
+	def self.test_connection
+		@hosts.each do |host|
+			begin
+				Net::SSH.start(host, @username, :password => @password) do |ssh|
+					puts "Connected to #{host} successfully."
+				end
+			rescue
+				puts "Error connecting to #{host}."
+			end
+		end
+	end
+
+	def self.run to_run = [:upload, :precommands, :gems, :command]
+		# Set some defaults
 		@files ||= []
 		@gems ||= []
 		@precommands ||= []
@@ -50,41 +63,64 @@ class Cloudler
 
 		@hosts.each do |host|
 			Net::SSH.start(host, @username, :password => @password) do |ssh|
-				puts "Uploading files..."
-				ssh.exec! "rm -rf #{@path}"
-				ssh.exec! "mkdir #{@path}"
-				if @files.length > 0
-	  			ssh.scp.upload!(@files.join(' '), @path, :recursive => true)
-				else
-					ssh.scp.upload!('.', @path, :recursive => true)
+				if to_run.member? :upload
+					puts "Uploading files..."
+					upload_files ssh	
+					puts "Files uploaded."
 				end
-				
-				puts "Files uploaded."
 	
-				if @precommands.length > 0
-					puts "Executing pre-commands"
-					@precommands.each do |command|
-						ssh.exec "cd #{@path} && #{command}" do |ch,stream,data|
-							puts data
-						end
+				if to_run.member? :precommands
+					if @precommands.length > 0
+						puts "Executing pre-commands"
+						execute_precommands ssh
+						puts "Pre-commands executed."
 					end
-					puts "Pre-commands executed."
 				end
 
-				if @gems.length > 0 
-					puts "Installing gems..."
-					ssh.exec! "gem install #{@gems.join ' '}" do |ch, stream, data|
-						puts data
+				if to_run.member? :gems
+					if @gems.length > 0 
+						puts "Installing gems..."
+						install_gems ssh
+						puts "Gems installed"
 					end
-					puts "Gems installed"
 				end
 	
-				puts "Executing command..."
-				ssh.exec! "cd #{@path} && #{@command}" do |ch, stream, data|
-					puts data
+				if to_run.member? :command
+					puts "Executing command..."
+					execute_command ssh
+					puts "Command finished."
 				end
-				puts "Command finished."
 			end				
+		end
+	end
+
+	def self.upload_files ssh
+		ssh.exec! "rm -rf #{@path}"
+		ssh.exec! "mkdir #{@path}"
+		if @files.length > 0
+	  	ssh.scp.upload!(@files.join(' '), @path, :recursive => true)
+		else
+			ssh.scp.upload!('.', @path, :recursive => true)
+		end
+	end
+
+	def self.execute_precommands ssh
+		@precommands.each do |command|
+			ssh.exec "cd #{@path} && #{command}" do |ch,stream,data|
+				puts data
+			end
+		end
+	end
+
+	def self.install_gems ssh
+		ssh.exec! "gem install #{@gems.join ' '}" do |ch, stream, data|
+			puts data
+		end
+	end
+
+	def self.execute_command ssh
+		ssh.exec! "cd #{@path} && #{@command}" do |ch, stream, data|
+			puts data
 		end
 	end
 
